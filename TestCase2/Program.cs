@@ -5,16 +5,17 @@ using OpenQA.Selenium;
 
 namespace TestCase2
 {
-    class Program
+    class Test
     {
-        static IWebDriver browser;
+		private IWebDriver browser;
 
-        static void Main(string[] args)
+        public Test(IWebDriver driver)
         {
+            this.browser = driver;
+        }
 
-
-            browser = new OpenQA.Selenium.Chrome.ChromeDriver();//1. Открыть браузер
-
+        public void test()
+        {
             browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
             browser.Manage().Window.Maximize();//1.развернуть на весь экран
@@ -25,7 +26,7 @@ namespace TestCase2
 
             browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(7);
 
-            if (check("/html/body/div[4]/div[3]", browser))
+            if (check("/html/body/div[4]/div[3]"))
             {
                 browser.FindElement(By.XPath("/html/body/div[4]/div[3]/div/div/div[2]/div[1]")).Click();
                 browser.FindElement(By.XPath("/html/body/div[1]/div/span/div[2]/noindex/div[2]/div/div/div/div[2]")).Click();//4. Выбрать раздел электроника
@@ -48,10 +49,11 @@ namespace TestCase2
 
 
             int count = browser.FindElements(By.ClassName("n-snippet-cell2__title")).Count;
-            if(count == 12)
+            if (count == 12)
             {
                 MessageBox.Show("Count = " + count);//10. Проверить, что элементов на странице 12.
-            } else MessageBox.Show("Count = " + count + " != 12");//10. Проверить, что элементов на странице 12.
+            }
+            else MessageBox.Show("Count = " + count + " != 12");//10. Проверить, что элементов на странице 12.
 
             browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
@@ -70,19 +72,32 @@ namespace TestCase2
                 MessageBox.Show("Success!");
             }
             else MessageBox.Show("Fail!");//13. Найти и проверить, что наименование товара соответствует запомненному значению.
+
         }
 
-        private static bool check(String str, IWebDriver driver)
+        private bool check(String str)
         {
             try
             {
-                driver.FindElement(By.XPath(str));
+                browser.FindElement(By.XPath(str));
                 return true;
             }
             catch (NoSuchElementException)
             {
                 return false;
             }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {                     
+            Test test = new Test(new OpenQA.Selenium.Chrome.ChromeDriver());
+            test.test();
+
+            Test test2 = new Test(new OpenQA.Selenium.Firefox.FirefoxDriver());
+            test2.test();
         }
     }
 }
